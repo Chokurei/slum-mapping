@@ -118,7 +118,7 @@ $ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/image/* guo@sakurag04.cw503.net:~
 In server
 
 ### 4.2.1 Data Extraction
-Choose training tiles names, and edit train.txt and test.txt in "./src/";
+Choose training tiles names, and edit train.txt and test.txt in "./src/shenzhen_2.0_train/";
 
 Edit "./utils/extractor.py", extracted data saved in "./dataset/shenzhen_2.0_train_rand/";
 
