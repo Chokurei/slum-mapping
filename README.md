@@ -15,6 +15,8 @@ Select Vector Layers to Add: Geometry type: Polygon
 ```
 <img width="1524" alt="Screen Shot 2021-04-24 at 23 40 10" src="https://user-images.githubusercontent.com/16301109/115962546-e0aaea00-a556-11eb-9455-960b92d676c1.png">
 
+Save shapefile to "./src/ori/cities/Shenzhen/shapefile/shenzhen.shp"
+
 **Add Google Satellite Layer**
 
 Find [Google Maps URL](https://mt1.google.com/vt/lyrs%3Ds%26x%3D%7Bx%7D%26y%3D%7By%7D%26z%3D%7Bz%7D)
@@ -36,7 +38,7 @@ Extract target Google Satellite Imagery based on related shapefile
 ```
 XYZ Tiles：Google Satellite -> Export layer -> To file 
 ```
-Save to ./src/ori/cities/Shenzhen/dataset/2.0/image_full/Shenzhen.tif
+Save to "./src/ori/cities/Shenzhen/dataset/2.0/image_full/Shenzhen.tif"
 ```
 no Create VRT
 Calculate from Layer -> Shenzhen (as example)
@@ -44,9 +46,61 @@ Resolution (current: userdefined) -> 2 (as example)
 ```
 <img width="574" alt="Screen Shot 2021-04-29 at 21 52 58" src="https://user-images.githubusercontent.com/16301109/116553606-47ece380-a935-11eb-8041-a04fc4945f78.png">
 
-#### 4.1.3 Clip Into Small
-Shapefile with related Google Satellite imagery
-<img width="1524" alt="Screen Shot 2021-04-29 at 22 03 51" src="https://user-images.githubusercontent.com/16301109/116555113-f2193b00-a936-11eb-8896-75a672cfef72.png">
+#### 4.1.3 Clip Into Small Pieces
+Load shapefile with related Google Satellite imagery in GIS.
+
+Google Satellite imager dir:  "./src/ori/cities/Shenzhen/dataset/2.0/image_full/Shenzhen.tif"
+
+Shapefile dir: "./src/ori/cities/Shenzhen/shapefile/shenzhen.shp"
+
+<img width="1524" alt="Screen Shot 2021-04-29 at 22 22 05" src="https://user-images.githubusercontent.com/16301109/116557403-5e953980-a939-11eb-95bb-faf6a4e14b5f.png">
+
+Clip Google Satellite imagery and related ground truth (shapefile) into small pieces
+
+Run:
+```
+$ python ./utils/preprocess.py
+```
+Arguments:
+```python
+# city name
+CITY = 'Shenzhen' 
+# resolution
+RESO = '2.0'
+VRT_CLIP = True
+# tile shape size
+if VRT_CLIP:
+    tile_size_x = 5000
+    tile_size_y = 5000
+```
+
+Dataset saved in "./src/ori/cities/Shenzhen/dataset/2.0/", directory tree:
+```
+.
+├── anno
+│   ├── Shenzhen_0.tfw
+│   ├── Shenzhen_0.tif
+│   ├── ...
+│   ├── Shenzhen_41.tfw
+│   └── Shenzhen_41.tif
+├── anno_full
+│   ├── Shenzhen.tfw
+│   └── Shenzhen.tif
+├── image
+│   ├── Shenzhen_0.tfw
+│   ├── Shenzhen_0.tif
+│   ├── ...
+│   ├── Shenzhen_41.tfw
+│   └── Shenzhen_41.tif
+└── image_full
+    └── Shenzhen.tif
+```
+
+
+
+
+
+
 
 
 
