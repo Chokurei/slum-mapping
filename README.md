@@ -117,7 +117,7 @@ $ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/image/* guo@sakurag04.cw503.net:~
 ### 4.2 Model Training
 In server
 
-### 4.2.1 Data Extraction
+#### 4.2.1 Data Extraction
 Choose training tiles names, and edit train.txt and test.txt in "./src/shenzhen_2.0_train/";
 
 Edit "./utils/extractor.py", extracted data saved in "./dataset/shenzhen_2.0_train_rand/";
@@ -144,7 +144,7 @@ Debug args parameters in extractor.py:
                         help='random crop number')
 ```
 
-### 4.2.2 Training
+#### 4.2.2 Training
 Edit ./FPN.py, choose training dataset and related modes:
 ```python
     parser.add_argument('-train', type=lambda x: (str(x).lower() == 'true'), \
