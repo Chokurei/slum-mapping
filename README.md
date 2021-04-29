@@ -195,7 +195,7 @@ Final results saved in "./result/Guangzhou/2.0_trans/"
 ### 4.3 Visualization
 <img width="1524" alt="Screen Shot 2021-04-29 at 23 29 24" src="https://user-images.githubusercontent.com/16301109/116567869-fa777300-a942-11eb-861e-a940eb2df1ff.png">
 
-CM | Predicted (True) | Predicted (False)
+Confusion Matrix | Predicted (True) | Predicted (False)
 --- | --- | ---
 Actual (True) | Green | Red
 Actual (False) | Blue | No Color
