@@ -111,8 +111,8 @@ $ touch train.txt test.txt
 ```
 Upload dataset from local, run
 ```
-$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/anno/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/label/
-$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/image/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/image/
+$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/anno/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/Shenzhen_2.0_train/label/
+$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/image/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/Shenzhen_2.0_train/image/
 ```
 ### 4.2 Model Training
 In server
