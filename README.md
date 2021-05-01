@@ -168,6 +168,10 @@ Run
 ```
 $ python ./FPN.py
 ```
+or 
+```
+$ python ./FPN.py -train_data Shenzhen_2.0_train-rand -terminal 200
+```
 Log results saved in "./logs/"; trained model saved in ./checkpoint/
 
 ### 4.2 Inference
