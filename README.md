@@ -149,6 +149,7 @@ Edit ./FPN.py, choose training dataset and related modes:
 ```python
     parser.add_argument('-train', type=lambda x: (str(x).lower() == 'true'), \
                         default=True, help='train or not?')
+    # change into own dataset
     parser.add_argument('-train_data', type=str, default='Shenzhen_2.0_train-rand',
                         help='training data dir name')
     parser.add_argument('-is_multi', type=lambda x: (str(x).lower() == 'true'), default=False,
@@ -157,6 +158,7 @@ Edit ./FPN.py, choose training dataset and related modes:
                         help='trigger type for logging')
     parser.add_argument('-interval', type=int, default=10,
                         help='interval for logging')
+    # training iteration
     parser.add_argument('-terminal', type=int, default=200,
                         help='terminal for training ')
     parser.add_argument('-save_best', type=lambda x: (str(x).lower() == 'true'), default=True,
