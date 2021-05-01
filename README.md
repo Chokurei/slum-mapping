@@ -72,6 +72,9 @@ VRT_CLIP = True
 if VRT_CLIP:
     tile_size_x = 5000
     tile_size_y = 5000
+    
+shapefile_root = 'to/your/path/slum-mapping/src/ori/cities/%s/shapefile/%s.shp'%(CITY, CITY)
+dataset_dir = 'to/your/path/slum-mapping/src/ori/cities/%s/dataset/%s/'%(CITY, RESO)
 ```
 
 Dataset saved in "./src/ori/cities/Shenzhen/dataset/2.0/", directory tree:
