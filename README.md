@@ -36,7 +36,7 @@ Browser -> XYZ Tiles -> New Connection -> xxx
 
 Extract target Google Satellite Imagery based on related shapefile
 ```
-XYZ Tiles：Google Satellite -> Export layer -> To file 
+XYZ Tiles：Google Satellite -> Export layer -> To file ；or XYZ Tiles: New conection-> URL：http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z} 
 ```
 Save to "./src/ori/cities/Shenzhen/dataset/2.0/image_full/Shenzhen.tif"
 ```
