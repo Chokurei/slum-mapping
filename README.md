@@ -15,7 +15,7 @@ Select Vector Layers to Add: Geometry type: Polygon
 ```
 <img width="1524" alt="Screen Shot 2021-04-24 at 23 40 10" src="https://user-images.githubusercontent.com/16301109/115962546-e0aaea00-a556-11eb-9455-960b92d676c1.png">
 
-Save shapefile to "./src/ori/cities/Shenzhen/shapefile/shenzhen.shp"
+Save shapefile to "./src/ori/cities/Shenzhen/shapefile/shenzhen.shp", CRS in EPSG:3857 - WGS84 (meters instead of degrees).
 
 **Add Google Satellite Layer**
 
@@ -101,80 +101,91 @@ Dataset saved in "./src/ori/cities/Shenzhen/dataset/2.0/", directory tree:
 
 #### 4.1.4 Upload in GPU Server
 
-SSH connect to server, run
+SSH connect to reedbush server, run
 ```
-$ ssh -l guo sakurag04.cw503.net
+$ ssh -l p75001 reedbush.cc.u-tokyo.ac.jp
 ```
 Make training data dirs in server, run
 ```
-$ cd ~/Work/slum-mapping/src
+$ cd /lustre/gp75/p75001/Work/slum-mapping/src
 $ mkdir Shenzhen_2.0_train && cd Shenzhen_2.0_train
 $ mkdir image label
 $ touch train.txt test.txt
 ```
-Upload dataset from local, run
+Upload dataset from local via sftp, run on local terminal
 ```
-$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/anno/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/Shenzhen_2.0_train/label/
-$ scp -r ./src/ori/cities/Shenzhen/dataset/2.0/image/* guo@sakurag04.cw503.net:~/Work/slum-mapping/src/Shenzhen_2.0_train/image/
+$ sftp p75001@reedbush.cc.u-tokyo.ac.jp
+sftp> lcd xx # Change the local directory
+sftp> cd xx # Change the remote directory
+sftp> put # # Transfer file from local root to remote server
 ```
+an example for uploading annotation, run on local terminal
+```
+$ sftp p75001@reedbush.cc.u-tokyo.ac.jp
+sftp> lcd ./src/ori/cities/Shenzhen/dataset/2.0/anno/
+sftp> cd /lustre/gp75/p75001/Work/slum-mapping/src/Shenzhen_2.0_train/label/
+sftp> put
+```
+an example for uploading image, run on local terminal
+```
+$ sftp p75001@reedbush.cc.u-tokyo.ac.jp
+sftp> lcd ./src/ori/cities/Shenzhen/dataset/2.0/image/
+sftp> cd /lustre/gp75/p75001/Work/slum-mapping/src/Shenzhen_2.0_train/image/
+sftp> put
+```
+
 ### 4.2 Model Training
 In server
 
 #### 4.2.1 Data Extraction
 Choose training tiles names, and edit train.txt and test.txt in "./src/shenzhen_2.0_train/";
 
-Edit "./utils/extractor.py", extracted data saved in "./dataset/shenzhen_2.0_train_rand/";
-
-Debug args parameters in extractor.py:
-```python
-    parser.add_argument('-data', type=str, default="Shenzhen_2.0_train",
-                        help='data dir for processing')
-    parser.add_argument('-data_usage', type=str, default="train", \
-                        choices=['train', 'test', 'trans'],\
-                        help='data usage for training, testing, or transfer learning?')
-    parser.add_argument('-split', type=list, default=[0.8, 0.1, 0.1],
-                        help='train, val, and test partition')
-    parser.add_argument('-mode', type=str, default="slide-rand",
-                        choices=['slide-stride', 'vector', 'slide-rand'],
-                        help='croping mode ')
-    parser.add_argument('-img_rows', type=int, default=224,
-                        help='img rows for croping ')
-    parser.add_argument('-img_cols', type=int, default=224,
-                        help='img cols for croping ')
-    parser.add_argument('-stride', type=int, default=224,
-                        help='img cols for croping ')
-    parser.add_argument('-nb_crop', type=int, default=400,
-                        help='random crop number')
+Edit "./utils/run_extractor.sh" for your own requirement
 ```
+#!/bin/sh
+#PBS -q l-debug
+#PBS -W group_list=gp75
+#PBS -l select=4:mpiprocs=8:ompthreads=4
+#PBS -l walltime=00:10:00
+cd $PBS_O_WORKDIR
+. /etc/profile.d/modules.sh
+module purge
+module load anaconda3/2019.10 cuda10/10.0.130 intel openmpi/3.1.4/intel
+export PYTHONUSERBASE=/lustre/gp75/p75001/packages
+export LD_LIBRARY_PATH=/lustre/app/acc/anaconda3/2019.10/lib
+python ./extractor.py -data Shenzhen_2.0_train -data_usage train -mode slide-rand -nb_crop 400
+```
+run run_extractor.sh in ./utils/
+```
+$ qsub run_extractor.sh
+```
+extracted data saved in "./dataset/shenzhen_2.0_train_rand/";
 
 #### 4.2.2 Training
-Edit ./FPN.py, choose training dataset and related modes:
-```python
-    parser.add_argument('-train', type=lambda x: (str(x).lower() == 'true'), \
-                        default=True, help='train or not?')
-    # change into own dataset
-    parser.add_argument('-train_data', type=str, default='Shenzhen_2.0_train-rand',
-                        help='training data dir name')
-    parser.add_argument('-is_multi', type=lambda x: (str(x).lower() == 'true'), default=False,
-                        help='multi-class or not')
-    parser.add_argument('-trigger', type=str, default='iter', choices=['epoch', 'iter'],
-                        help='trigger type for logging')
-    parser.add_argument('-interval', type=int, default=10,
-                        help='interval for logging')
-    # training iteration
-    parser.add_argument('-terminal', type=int, default=200,
-                        help='terminal for training ')
-    parser.add_argument('-save_best', type=lambda x: (str(x).lower() == 'true'), default=True,
-                        help='only save best val_loss model')
+Edit ./run_FPN.sh, choose training dataset and related modes:
+```
+#!/bin/sh
+#PBS -q l-regular
+#PBS -W group_list=gp75
+#PBS -l select=4:mpiprocs=8:ompthreads=4
+#PBS -l walltime=100:00:00
+cd $PBS_O_WORKDIR
+. /etc/profile.d/modules.sh
+module purge
+module load anaconda3/2019.10 cuda10/10.0.130 intel openmpi/3.1.4/intel
+export PYTHONUSERBASE=/lustre/gp75/p75001/packages
+export LD_LIBRARY_PATH=/lustre/app/acc/anaconda3/2019.10/lib
+python ./FPN.py -train_data Shenzhen_2.0_train-rand -terminal 1200
 ```
 Run
 ```
-$ python ./FPN.py
+$ qsub ./run_FPN.sh
 ```
-or 
+Check running status:
 ```
-$ python ./FPN.py -train_data Shenzhen_2.0_train-rand -terminal 200
+$ rbstat
 ```
+
 Log results saved in "./logs/"; trained model saved in ./checkpoint/
 
 ### 4.2 Inference
@@ -182,17 +193,24 @@ Take testing Guangzhou_2.0 as an example;
 
 Prepare Guangzhou_2.0_test as introduced in 4.2.1;
 
-Edit "./vissin_Area.py", debug args parameters:
-```python
-    parser.add_argument('-data', type=str, default="Guangzhou_2.0_test",
-                        help='data dir for processing')
-    parser.add_argument('-checkpoints', nargs='+', type=str, default=[
-        'FPNUNet_epoch_100_Jun06_10_47.pth',
-    ],
+Edit "./run_inference.sh", debug args parameters:
+```
+#!/bin/sh
+#PBS -q l-regular
+#PBS -W group_list=gp75
+#PBS -l select=4:mpiprocs=8:ompthreads=4
+#PBS -l walltime=00:40:00
+cd $PBS_O_WORKDIR
+. /etc/profile.d/modules.sh
+module purge
+module load anaconda3/2019.10 cuda10/10.0.130 intel openmpi/3.1.4/intel
+export PYTHONUSERBASE=/lustre/gp75/p75001/packages
+export LD_LIBRARY_PATH=/lustre/app/acc/anaconda3/2019.10/lib
+python ./vissin_Area.py -data Guangzhou_2.0_test -checkpoints FPN_epoch_300_May11_00_16.pth
 ```
 Run:
 ```
-$ python ./vissin_Area.py
+$ qsub run_inference.sh
 ```
 Results will bed saved in "./result/area-binary".
 
